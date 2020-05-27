@@ -5,6 +5,8 @@
     <title>{{.WebTitle}}</title>
 </head>
 <body>
-
+{{range .Nicknames}}
+    <p>{{.Nick}}</p>
+{{end}}
 </body>
 </html>

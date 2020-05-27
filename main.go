@@ -2,15 +2,30 @@ package main
 
 import (
 	"html/template"
+	"math/rand"
 	"net/http"
 )
 
+type Generated struct {
+	Nick string
+}
+
 type WebData struct {
-	WebTitle string
+	WebTitle  string
+	Nicknames []Generated
+}
+
+var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func generateNickname(length int) string {
+	b := make([]rune, length)
+	for i := range b {
+		b[i] = letterRunes[rand.Intn(len(letterRunes))]
+	}
+	return string(b)
 }
 
 func main() {
-
 
 	tmpl := template.Must(template.ParseFiles("assets/index.html"))
 
@@ -18,6 +33,18 @@ func main() {
 
 		data := WebData{
 			WebTitle: "Nick Generator",
+			Nicknames: []Generated{
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+				{Nick: generateNickname(10)},
+			},
 		}
 
 		_ = tmpl.Execute(writer, data)
