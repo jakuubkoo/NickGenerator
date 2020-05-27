@@ -1,19 +1,12 @@
 package main
 
 import (
-	"html/template"
+	"fmt"
+	"github.com/gorilla/mux"
 	"math/rand"
 	"net/http"
+	"strconv"
 )
-
-type Generated struct {
-	Nick string
-}
-
-type WebData struct {
-	WebTitle  string
-	Nicknames []Generated
-}
 
 var letterRunes = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -27,31 +20,25 @@ func generateNickname(length int) string {
 
 func main() {
 
-	tmpl := template.Must(template.ParseFiles("assets/index.html"))
+	r := mux.NewRouter()
 
-	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+	r.HandleFunc("/generate/{nickname}/{nicksCount}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		nickname := vars["nickname"]
+		nicks := vars["nicksCount"]
 
-		data := WebData{
-			WebTitle: "Nick Generator",
-			Nicknames: []Generated{
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-				{Nick: generateNickname(10)},
-			},
+		nickLength := len(nickname)
+
+		nicksCount, _ := strconv.Atoi(nicks)
+
+		_, _ = fmt.Fprintln(w, "")
+
+		for i := 0; i < nicksCount; i++ {
+			_, _ = fmt.Fprintln(w, nickname+"_"+generateNickname(15-nickLength))
+			_, _ = fmt.Fprintln(w, "")
 		}
-
-		_ = tmpl.Execute(writer, data)
 	})
 
-	http.Handle("/static/", http.StripPrefix("/static/", http.FileServer(http.Dir("assets/"))))
-
-	_ = http.ListenAndServe(":8080", nil)
+	_ = http.ListenAndServe(":8080", r)
 
 }
